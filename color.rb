@@ -2,7 +2,12 @@ class Color
   attr_accessor :r, :g, :b
 
   def initialize(rgb_hex)
-    @r, @g, @b = rgb_hex.scan(/\h\h/).map(&:hex)
+    case rgb_hex
+    when /#\h{6}/
+      @r, @g, @b = rgb_hex.scan(/\h\h/).map(&:hex)
+    when /#\h{3}/
+      @r, @g, @b = rgb_hex.scan(/\h/).map{|c| c*2 }.map(&:hex)
+    end
   end
 
   def diff(c)
@@ -19,7 +24,7 @@ class Color
 
   def to_xyz
     # conversion from RGB to XYZ
-    r, g, b = [self.r/255.0, self.g/255.0, self.b/255.0]
+    r, g, b = [@r/255.0, @g/255.0, @b/255.0]
 
     r = (r > 0.04045) ? ((r+0.055)/1.055)**2.4 : r/12.92
     g = (g > 0.04045) ? ((g+0.055)/1.055)**2.4 : g/12.92
