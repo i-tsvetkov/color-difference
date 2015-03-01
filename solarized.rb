@@ -23,7 +23,7 @@ ARGF.argv.each do |file|
 
   text = File.read(file)
   colors = text.scan(/#(?:\h{3}){1,2}/)
-  scheme = make_color_scheme(color, solarized_colors)
+  scheme = make_color_scheme(colors, solarized_colors)
 
   # replace long strings before short ones
   scheme.sort_by!{ |c| -c[:from].length }
