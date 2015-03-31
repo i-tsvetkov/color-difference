@@ -11,7 +11,7 @@ class Color
       @r, @g, @b = color.scan(/\d+/).map(&:to_i)
     when /rgba?\(\s*\d+%\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[.\d]+\s*)?\)/
       @r, @g, @b = color.scan(/\d+/).map{|p| (p.to_i * 255/100.0).round }
-    when /hsla?\(\s*\d+\s*,\s*[.\d]+%\s*,\s*[.\d]+%\s*(,\s*[.\d]+\s*)?\)/
+    when /hsla?\(\s*[.\d]+\s*,\s*[.\d]+%\s*,\s*[.\d]+%\s*(,\s*[.\d]+\s*)?\)/
       h, s, l = color.scan(/[.\d]+/).map(&:to_i)
       @r, @g, @b = hsl_to_rgb(h/360.0, s/100.0, l/100.0)
     when COLOR_NAMES_REGEX
@@ -101,8 +101,6 @@ class Color
     end
     return [r.round, g.round, b.round]
   end
-
-  COLOR_NAMES_REGEX = Regexp.new(COLOR_NAMES.map{ |c| c[0] }.join("|"), 'i')
 
   COLOR_NAMES = {"aqua"=>"#00ffff",
                  "aliceblue"=>"#f0f8ff",
@@ -252,4 +250,6 @@ class Color
                  "white"=>"#ffffff",
                  "yellow"=>"#ffff00",
                  "rebeccapurple"=>"#663399"}
+
+  COLOR_NAMES_REGEX = Regexp.new(COLOR_NAMES.map{ |c| c[0] }.join("|"), 'i')
 end
