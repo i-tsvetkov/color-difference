@@ -22,14 +22,14 @@ ARGF.argv.each do |file|
   end
 
   text = File.read(file)
-  colors = text.scan(/#(?:\h{3}){1,2}/)
+  colors = text.scan(/#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\)/).uniq
   scheme = make_color_scheme(colors, solarized_colors)
 
   # replace long strings before short ones
   scheme.sort_by!{ |c| -c[:from].length }
 
   scheme.each do |s|
-    text.gsub!(/#{s[:from]}/, s[:to])
+    text.gsub!(s[:from], s[:to])
   end
 
   File.write(file, text)
