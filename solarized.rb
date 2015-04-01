@@ -1,15 +1,5 @@
 require './color.rb'
-
-def make_color_scheme(from_colors, to_colors)
-  from_colors = from_colors.map{ |c| { :src => c, :clr => Color.new(c) } }
-  to_colors = to_colors.map{ |c| Color.new(c) }
-  scheme = from_colors.map { |fc|
-    { :from => fc[:src],
-      :to   => to_colors.min_by{ |tc| fc[:clr].diff(tc) }.to_s
-    }
-  }
-  return scheme
-end
+require './utils.rb'
 
 solarized_colors = ["#002b36", "#073642", "#586e75", "#657b83",
                     "#839496", "#93a1a1", "#eee8d5", "#fdf6e3",
