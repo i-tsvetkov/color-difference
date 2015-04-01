@@ -12,7 +12,7 @@ ARGF.argv.each do |file|
   end
 
   text = File.read(file)
-  colors = text.scan(/#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\)/).uniq
+  colors = text.scan(/#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\)/i).uniq
   scheme = make_color_scheme(colors, solarized_colors)
 
   # replace long strings before short ones
