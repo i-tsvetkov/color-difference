@@ -18,7 +18,7 @@ solarized_inverted = { "#fdf6e3" => "#002b36",
                      }
 
 ARGF.argv.each do |file|
-  if not File.exist?(file)
+  if not File.exist?(file) or file.eql?("--invert")
     next
   end
 
@@ -26,10 +26,12 @@ ARGF.argv.each do |file|
   colors = text.scan(/#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\)/i).uniq
   scheme = make_color_scheme(colors, solarized_colors)
 
-  scheme.map!{ |c|
-    solarized_inverted.key?(c[:to].downcase) ?
-      { :from => c[:from], :to => solarized_inverted[c[:to].downcase] } : c
-  }
+  if ARGF.argv.include?("--invert")
+    scheme.map!{ |c|
+      solarized_inverted.key?(c[:to].downcase) ?
+        { :from => c[:from], :to => solarized_inverted[c[:to].downcase] } : c
+    }
+  end
 
   # replace long strings before short ones
   scheme.sort_by!{ |c| -c[:from].length }
