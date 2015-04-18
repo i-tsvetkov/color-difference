@@ -27,10 +27,7 @@ ARGF.argv.each do |file|
   scheme = make_color_scheme(colors, solarized_colors)
 
   if ARGF.argv.include?("--invert")
-    scheme.map!{ |c|
-      solarized_inverted.key?(c[:to].downcase) ?
-        { :from => c[:from], :to => solarized_inverted[c[:to].downcase] } : c
-    }
+    scheme = replace_colors(scheme, solarized_inverted)
   end
 
   # replace long strings before short ones

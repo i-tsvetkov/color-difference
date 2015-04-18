@@ -25,3 +25,10 @@ def get_classes_with_color(css)
            \}/ix)
 end
 
+def replace_colors(colors, color_rules)
+  colors.map do |c|
+    color_rules.key?(c[:to].downcase) ?
+      { from: c[:from], to: color_rules[c[:to].downcase] } : c
+  end
+end
+
