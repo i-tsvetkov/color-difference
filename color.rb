@@ -99,7 +99,7 @@ class Color
       g = 255 * hue_to_rgb(v1, v2, h)
       b = 255 * hue_to_rgb(v1, v2, h - (1.0/3))
     end
-    return [r.round, g.round, b.round]
+    return [r, g, b].map(&:round)
   end
 
   COLOR_NAMES = {"aqua"=>"#00ffff",
@@ -251,5 +251,5 @@ class Color
                  "yellow"=>"#ffff00",
                  "rebeccapurple"=>"#663399"}
 
-  COLOR_NAMES_REGEX = Regexp.new(COLOR_NAMES.map{ |c| c[0] }.join("|"), 'i')
+  COLOR_NAMES_REGEX = Regexp.new(COLOR_NAMES.keys.join("|"), 'i')
 end
