@@ -18,11 +18,24 @@ def get_classes_with_color(css)
     # hex: /#(\h{3}){1,2}\b/
     # rgb/a: /\brgba?\([^()]+\)/
     # hsl/a: /\bhsla?\([^()]+\)/
-  css.scan(/[^{}]+\{
+  css = css.gsub(/\/\*.*?\*\//m, '')
+  css.scan(/([^{}]+)\{(
             (?:[^{}"']|"(?:[^\\"]|\\.)*"|'(?:[^\\']|\\.)*')*
             (?:\#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\))
             (?:[^{}"']|"(?:[^\\"]|\\.)*"|'(?:[^\\']|\\.)*')*
-           \}/ix)
+          )\}/ix).map do |selector, block|
+    rules = block.scan(/(?:[^"';]|"(?:[^\\"]|\\.)*"|'(?:[^\\']|\\.)*')+
+                       :(?:[^"';]|"(?:[^\\"]|\\.)*"|'(?:[^\\']|\\.)*')+/ix)
+    rules.select!{ |r| r.gsub(/".*"|'.*'/, '').match(/\#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\)/i) }
+    rules.map!(&:strip)
+    { selector: selector.strip, rules: rules }
+  end
+end
+
+def get_color_css(css)
+  get_classes_with_color(css).map do |c|
+    ["#{c[:selector]} {", "\t" + c[:rules].join(";\n\t") + ';', '}'].join("\n")
+  end.join("\n")
 end
 
 def replace_colors(colors, color_rules)

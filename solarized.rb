@@ -22,7 +22,7 @@ ARGF.argv.each do |file|
     next
   end
 
-  text = File.read(file)
+  text = get_color_css(File.read(file))
   colors = text.scan(/#(?:\h{3}){1,2}\b|\brgba?\([^()]+\)|\bhsla?\([^()]+\)/i).uniq
   scheme = make_color_scheme(colors, solarized_colors)
 
