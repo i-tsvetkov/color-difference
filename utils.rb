@@ -34,8 +34,8 @@ end
 
 def get_color_css(css)
   get_classes_with_color(css).map do |c|
-    ["#{c[:selector]} {", "\t" + c[:rules].join(";\n\t") + ';', '}'].join("\n")
-  end.join("\n")
+    ["#{c[:selector]} {\n\t", c[:rules].join(";\n\t"), ";\n}"].join
+  end.join("\n\n")
 end
 
 def replace_colors(colors, color_rules)
