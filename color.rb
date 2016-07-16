@@ -27,6 +27,11 @@ class Color
     return deltaE
   end
 
+  def light
+    l, _, _ = self.to_lab
+    return l
+  end
+
   def to_s
     '#' + [@r, @g, @b].map{ |x| "%02X" % x }.join
   end
