@@ -1,25 +1,45 @@
+require 'English'
+
 class Color
   attr_accessor :r, :g, :b, :a
+
+  INTEGER = /\s*(\d+)\s*/
+  NUMBER  = /\s*([+-]?(?:\d*\.\d+|\d+))\s*/
+  PERCENTAGE = /\s*([+-]?(?:\d*\.\d+|\d+))%\s*/
 
   def initialize(color)
     case color
     when /#\h{6}/
       @r, @g, @b = color.scan(/\h\h/).map(&:hex)
     when /#\h{3}/
-      @r, @g, @b = color.scan(/\h/).map{|c| c*2 }.map(&:hex)
-    when /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*([.\d]+)\s*)?\)/
-      @a = $~[2].to_f unless $~[2].nil? # $~ == $LAST_MATCH_INFO
-      @r, @g, @b = color.scan(/\d+/).map(&:to_i)
-    when /rgba?\(\s*\d+%\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*([.\d]+)\s*)?\)/
-      @a = $~[2].to_f unless $~[2].nil? # $~ == $LAST_MATCH_INFO
-      @r, @g, @b = color.scan(/\d+/).map{|p| (p.to_f * 255/100.0).round }
-    when /hsla?\(\s*[.\d]+\s*,\s*[.\d]+%\s*,\s*[.\d]+%\s*(,\s*[.\d]+\s*)?\)/
-      h, s, l, @a = color.scan(/[.\d]+/).map(&:to_f)
-      @r, @g, @b = hsl_to_rgb(h/360.0, s/100.0, l/100.0)
+      @r, @g, @b = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
+    when /rgb\(#{INTEGER},#{INTEGER},#{INTEGER}\)/
+      @r, @g, @b = $LAST_MATCH_INFO.captures.map(&:to_i)
+    when /rgb\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE}\)/
+      @r, @g, @b = $LAST_MATCH_INFO.captures.map{ |p| (p.to_f * 255/100.0).round }
+    when /hsl\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE}\)/
+      h, s, l = $LAST_MATCH_INFO.captures.map(&:to_f)
+      @r, @g, @b = hsl_to_rgb((h % 360)/360.0, s/100.0, l/100.0)
+    when /rgba\(#{INTEGER},#{INTEGER},#{INTEGER},#{NUMBER}\)/
+      @r, @g, @b = $LAST_MATCH_INFO.captures.take(3).map(&:to_i)
+      @a = $LAST_MATCH_INFO.captures.last.to_f
+    when /rgba\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)/
+      @r, @g, @b = $LAST_MATCH_INFO.captures.map{ |p| (p.to_f * 255/100.0).round }
+      @a = $LAST_MATCH_INFO.captures.last.to_f
+    when /hsla\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)/
+      h, s, l = $LAST_MATCH_INFO.captures.take(3).map(&:to_f)
+      @a = $LAST_MATCH_INFO.captures.last.to_f
+      @r, @g, @b = hsl_to_rgb((h % 360)/360.0, s/100.0, l/100.0)
+    when 'transparent'
+      @r = @g = @b = 0
+      @a = 0.0
     when COLOR_NAMES_REGEX
       @r, @g, @b = COLOR_NAMES[color.downcase].scan(/\h\h/).map(&:hex)
     end
 
+    @r ||= 0
+    @g ||= 0
+    @b ||= 0
     @a ||= 1.0
   end
 
