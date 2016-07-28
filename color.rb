@@ -1,5 +1,5 @@
 class Color
-  attr_accessor :r, :g, :b
+  attr_accessor :r, :g, :b, :a
 
   def initialize(color)
     case color
@@ -7,16 +7,20 @@ class Color
       @r, @g, @b = color.scan(/\h\h/).map(&:hex)
     when /#\h{3}/
       @r, @g, @b = color.scan(/\h/).map{|c| c*2 }.map(&:hex)
-    when /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[.\d]+\s*)?\)/
+    when /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*([.\d]+)\s*)?\)/
+      @a = $~[2].to_f unless $~[2].nil? # $~ == $LAST_MATCH_INFO
       @r, @g, @b = color.scan(/\d+/).map(&:to_i)
-    when /rgba?\(\s*\d+%\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[.\d]+\s*)?\)/
-      @r, @g, @b = color.scan(/\d+/).map{|p| (p.to_i * 255/100.0).round }
+    when /rgba?\(\s*\d+%\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*([.\d]+)\s*)?\)/
+      @a = $~[2].to_f unless $~[2].nil? # $~ == $LAST_MATCH_INFO
+      @r, @g, @b = color.scan(/\d+/).map{|p| (p.to_f * 255/100.0).round }
     when /hsla?\(\s*[.\d]+\s*,\s*[.\d]+%\s*,\s*[.\d]+%\s*(,\s*[.\d]+\s*)?\)/
-      h, s, l = color.scan(/[.\d]+/).map(&:to_i)
+      h, s, l, @a = color.scan(/[.\d]+/).map(&:to_f)
       @r, @g, @b = hsl_to_rgb(h/360.0, s/100.0, l/100.0)
     when COLOR_NAMES_REGEX
       @r, @g, @b = COLOR_NAMES[color.downcase].scan(/\h\h/).map(&:hex)
     end
+
+    @a ||= 1.0
   end
 
   def diff(c)
@@ -33,7 +37,11 @@ class Color
   end
 
   def to_s
-    '#' + [@r, @g, @b].map{ |x| "%02X" % x }.join
+    if @a == 1.0
+      '#' + [@r, @g, @b].map{ |x| "%02X" % x }.join
+    else
+      "rgba(#@r,\s#@g,\s#@b,\s#@a)"
+    end
   end
 
   def to_xyz
