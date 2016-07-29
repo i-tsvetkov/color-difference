@@ -4,8 +4,8 @@ class Color
   attr_accessor :r, :g, :b, :a
 
   INTEGER = /\s*(\d+)\s*/
-  NUMBER  = /\s*([+-]?(?:\d*\.\d+|\d+))\s*/
-  PERCENTAGE = /\s*([+-]?(?:\d*\.\d+|\d+))%\s*/
+  NUMBER  = /\s*([+-]?(?:\d*\.\d+|\d+)(?:[eE][+-]?\d+)?)\s*/
+  PERCENTAGE = /\s*([+-]?(?:\d*\.\d+|\d+)(?:[eE][+-]?\d+)?)%\s*/
 
   def initialize(color)
     color = color.strip
