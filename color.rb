@@ -9,8 +9,16 @@ class Color
 
   def initialize(color)
     case color
+    when /#\h{8}/
+      @r, @g, @b, @a = color.scan(/\h\h/).map(&:hex)
+      @a /= 255.0
+
     when /#\h{6}/
       @r, @g, @b = color.scan(/\h\h/).map(&:hex)
+
+    when /#\h{4}/
+      @r, @g, @b, @a = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
+      @a /= 255.0
 
     when /#\h{3}/
       @r, @g, @b = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
