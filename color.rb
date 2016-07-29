@@ -8,40 +8,43 @@ class Color
   PERCENTAGE = /\s*([+-]?(?:\d*\.\d+|\d+))%\s*/
 
   def initialize(color)
+    color = color.strip
+
     case color
-    when /#\h{8}/
+
+    when /^#\h{8}$/
       @r, @g, @b, @a = color.scan(/\h\h/).map(&:hex)
       @a /= 255.0
 
-    when /#\h{6}/
+    when /^#\h{6}$/
       @r, @g, @b = color.scan(/\h\h/).map(&:hex)
 
-    when /#\h{4}/
+    when /^#\h{4}$/
       @r, @g, @b, @a = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
       @a /= 255.0
 
-    when /#\h{3}/
+    when /^#\h{3}$/
       @r, @g, @b = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
 
-    when /rgb\(#{INTEGER},#{INTEGER},#{INTEGER}\)/
+    when /^rgb\(#{INTEGER},#{INTEGER},#{INTEGER}\)$/
       @r, @g, @b = check_rgb($LAST_MATCH_INFO.captures.map(&:to_i))
 
-    when /rgb\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE}\)/
+    when /^rgb\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE}\)$/
       @r, @g, @b = percentages_to_rgb($LAST_MATCH_INFO.captures.map(&:to_f))
 
-    when /hsl\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE}\)/
+    when /^hsl\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE}\)$/
       h, s, l = $LAST_MATCH_INFO.captures.map(&:to_f)
       @r, @g, @b = hsl_to_rgb(h, s, l)
 
-    when /rgba\(#{INTEGER},#{INTEGER},#{INTEGER},#{NUMBER}\)/
+    when /^rgba\(#{INTEGER},#{INTEGER},#{INTEGER},#{NUMBER}\)$/
       @r, @g, @b = check_rgb($LAST_MATCH_INFO.captures.take(3).map(&:to_i))
       @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
 
-    when /rgba\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)/
+    when /^rgba\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)$/
       @r, @g, @b = percentages_to_rgb($LAST_MATCH_INFO.captures.map(&:to_f))
       @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
 
-    when /hsla\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)/
+    when /^hsla\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)$/
       h, s, l = $LAST_MATCH_INFO.captures.take(3).map(&:to_f)
       @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
       @r, @g, @b = hsl_to_rgb(h, s, l)
@@ -52,11 +55,12 @@ class Color
 
     when COLOR_NAMES_REGEX
       @r, @g, @b = COLOR_NAMES[color.downcase].scan(/\h\h/).map(&:hex)
+
+    else
+      @r = @g = @b = 0
+
     end
 
-    @r ||= 0
-    @g ||= 0
-    @b ||= 0
     @a ||= 1.0
   end
 
@@ -332,5 +336,5 @@ class Color
                  "yellow"=>"#ffff00",
                  "rebeccapurple"=>"#663399"}
 
-  COLOR_NAMES_REGEX = Regexp.new(COLOR_NAMES.keys.join("|"), 'i')
+  COLOR_NAMES_REGEX = Regexp.new('^(' + COLOR_NAMES.keys.join("|") + ')$', 'i')
 end
