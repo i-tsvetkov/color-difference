@@ -3,7 +3,7 @@ require 'English'
 class Color
   attr_accessor :r, :g, :b, :a
 
-  INTEGER = /\s*(\d+)\s*/
+  INTEGER = /\s*([+-]?\d+)\s*/
   NUMBER  = /\s*([+-]?(?:\d*\.\d+|\d+)(?:[eE][+-]?\d+)?)\s*/
   PERCENTAGE = /\s*([+-]?(?:\d*\.\d+|\d+)(?:[eE][+-]?\d+)?)%\s*/
 
