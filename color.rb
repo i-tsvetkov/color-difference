@@ -11,28 +11,37 @@ class Color
     case color
     when /#\h{6}/
       @r, @g, @b = color.scan(/\h\h/).map(&:hex)
+
     when /#\h{3}/
       @r, @g, @b = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
+
     when /rgb\(#{INTEGER},#{INTEGER},#{INTEGER}\)/
-      @r, @g, @b = $LAST_MATCH_INFO.captures.map(&:to_i)
+      @r, @g, @b = check_rgb($LAST_MATCH_INFO.captures.map(&:to_i))
+
     when /rgb\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE}\)/
-      @r, @g, @b = $LAST_MATCH_INFO.captures.map{ |p| (p.to_f * 255/100.0).round }
+      @r, @g, @b = percentages_to_rgb($LAST_MATCH_INFO.captures.map(&:to_f))
+
     when /hsl\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE}\)/
       h, s, l = $LAST_MATCH_INFO.captures.map(&:to_f)
-      @r, @g, @b = hsl_to_rgb((h % 360)/360.0, s/100.0, l/100.0)
+      @r, @g, @b = hsl_to_rgb(h, s, l)
+
     when /rgba\(#{INTEGER},#{INTEGER},#{INTEGER},#{NUMBER}\)/
-      @r, @g, @b = $LAST_MATCH_INFO.captures.take(3).map(&:to_i)
-      @a = $LAST_MATCH_INFO.captures.last.to_f
+      @r, @g, @b = check_rgb($LAST_MATCH_INFO.captures.take(3).map(&:to_i))
+      @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
+
     when /rgba\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)/
-      @r, @g, @b = $LAST_MATCH_INFO.captures.map{ |p| (p.to_f * 255/100.0).round }
-      @a = $LAST_MATCH_INFO.captures.last.to_f
+      @r, @g, @b = percentages_to_rgb($LAST_MATCH_INFO.captures.map(&:to_f))
+      @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
+
     when /hsla\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)/
       h, s, l = $LAST_MATCH_INFO.captures.take(3).map(&:to_f)
-      @a = $LAST_MATCH_INFO.captures.last.to_f
-      @r, @g, @b = hsl_to_rgb((h % 360)/360.0, s/100.0, l/100.0)
+      @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
+      @r, @g, @b = hsl_to_rgb(h, s, l)
+
     when 'transparent'
       @r = @g = @b = 0
       @a = 0.0
+
     when COLOR_NAMES_REGEX
       @r, @g, @b = COLOR_NAMES[color.downcase].scan(/\h\h/).map(&:hex)
     end
@@ -104,6 +113,30 @@ class Color
 
   private
 
+  def check_integer(i)
+    [0, [255, i].min].max
+  end
+
+  def check_rgb(rgb)
+    rgb.map do |c|
+      check_integer(c)
+    end
+  end
+
+  def check_percentage(p)
+    [0, [100, p].min].max
+  end
+
+  def percentages_to_rgb(percentages)
+    percentages.map do |p|
+      (check_percentage(p) * 255/100.0).round
+    end
+  end
+
+  def check_alpha(a)
+    [0.0, [1.0, a].min].max
+  end
+
   def hue_to_rgb(v1, v2, vH)
     vH += 1 if vH < 0
     vH -= 1 if vH > 1
@@ -121,6 +154,9 @@ class Color
   end
 
   def hsl_to_rgb(h, s, l)
+    h = (h % 360) / 360.0
+    s = check_percentage(s) / 100.0
+    l = check_percentage(l) / 100.0
     if s == 0
       r = l * 255
       g = l * 255
