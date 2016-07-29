@@ -81,7 +81,7 @@ class Color
     if @a == 1.0
       '#' + [@r, @g, @b].map{ |x| "%02X" % x }.join
     else
-      "rgba(#@r,\s#@g,\s#@b,\s#@a)"
+      "rgba(#@r,\s#@g,\s#@b,\s#{@a.round(2)})"
     end
   end
 
