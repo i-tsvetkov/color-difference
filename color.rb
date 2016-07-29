@@ -73,6 +73,10 @@ class Color
     end
   end
 
+  def to_color_name
+    COLOR_NAMES.key(self.to_s.downcase)
+  end
+
   def to_xyz
     # conversion from RGB to XYZ
     r, g, b = [@r/255.0, @g/255.0, @b/255.0]
