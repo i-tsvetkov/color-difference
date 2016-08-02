@@ -1,5 +1,3 @@
-require 'English'
-
 class Color
   attr_accessor :r, :g, :b, :a
 
@@ -27,26 +25,26 @@ class Color
       @r, @g, @b = color.scan(/\h/).map{ |c| c * 2 }.map(&:hex)
 
     when /^rgb\(#{INTEGER},#{INTEGER},#{INTEGER}\)$/
-      @r, @g, @b = check_rgb($LAST_MATCH_INFO.captures.map(&:to_i))
+      @r, @g, @b = normalize_colors($~.captures.map(&:to_i))
 
     when /^rgb\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE}\)$/
-      @r, @g, @b = percentages_to_rgb($LAST_MATCH_INFO.captures.map(&:to_f))
+      @r, @g, @b = percentages_to_rgb($~.captures.map(&:to_f))
 
     when /^hsl\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE}\)$/
-      h, s, l = $LAST_MATCH_INFO.captures.map(&:to_f)
+      h, s, l = $~.captures.map(&:to_f)
       @r, @g, @b = hsl_to_rgb(h, s, l)
 
     when /^rgba\(#{INTEGER},#{INTEGER},#{INTEGER},#{NUMBER}\)$/
-      @r, @g, @b = check_rgb($LAST_MATCH_INFO.captures.take(3).map(&:to_i))
-      @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
+      @r, @g, @b = normalize_colors($~.captures.take(3).map(&:to_i))
+      @a = normalize_alpha($~.captures.last.to_f)
 
     when /^rgba\(#{PERCENTAGE},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)$/
-      @r, @g, @b = percentages_to_rgb($LAST_MATCH_INFO.captures.map(&:to_f))
-      @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
+      @r, @g, @b = percentages_to_rgb($~.captures.map(&:to_f))
+      @a = normalize_alpha($~.captures.last.to_f)
 
     when /^hsla\(#{NUMBER},#{PERCENTAGE},#{PERCENTAGE},#{NUMBER}\)$/
-      h, s, l = $LAST_MATCH_INFO.captures.take(3).map(&:to_f)
-      @a = check_alpha($LAST_MATCH_INFO.captures.last.to_f)
+      h, s, l = $~.captures.take(3).map(&:to_f)
+      @a = normalize_alpha($~.captures.last.to_f)
       @r, @g, @b = hsl_to_rgb(h, s, l)
 
     when 'transparent'
@@ -129,28 +127,26 @@ class Color
 
   private
 
-  def check_integer(i)
-    [0, [255, i].min].max
+  def normalize_color(c)
+    [0, [255, c].min].max
   end
 
-  def check_rgb(rgb)
-    rgb.map do |c|
-      check_integer(c)
-    end
-  end
-
-  def check_percentage(p)
+  def normalize_percentage(p)
     [0, [100, p].min].max
+  end
+
+  def normalize_alpha(a)
+    [0.0, [1.0, a].min].max
+  end
+
+  def normalize_colors(colors)
+    colors.map{ |c| normalize_color(c) }
   end
 
   def percentages_to_rgb(percentages)
     percentages.map do |p|
-      (check_percentage(p) * 255/100.0).round
+      (normalize_percentage(p) * 255/100.0).round
     end
-  end
-
-  def check_alpha(a)
-    [0.0, [1.0, a].min].max
   end
 
   def hue_to_rgb(v1, v2, vH)
@@ -171,8 +167,8 @@ class Color
 
   def hsl_to_rgb(h, s, l)
     h = (h % 360) / 360.0
-    s = check_percentage(s) / 100.0
-    l = check_percentage(l) / 100.0
+    s = normalize_percentage(s) / 100.0
+    l = normalize_percentage(l) / 100.0
     if s == 0
       r = l * 255
       g = l * 255
