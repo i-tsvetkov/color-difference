@@ -70,6 +70,17 @@ class Color
     return deltaE
   end
 
+  def self.transform_palette(from_colors, to_colors)
+    from_colors = from_colors.map{ |c| { color: Color.new(c), src: c } }
+    to_colors   = to_colors.map{ |c| Color.new(c) }
+    from_colors.map do |fc|
+      from = fc[:src]
+      to   = to_colors.min_by{ |tc| fc[:color].diff(tc) }
+      to.a = fc[:color].a
+      { old_color: from, new_color: to.to_s }
+    end
+  end
+
   def light
     l, _, _ = self.to_lab
     return l
