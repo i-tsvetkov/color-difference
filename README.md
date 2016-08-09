@@ -7,6 +7,7 @@ The color matching is based on **Delta E (CIE76)**.
 ## Code examples
 ```ruby
 require './color.rb'
+require 'json'
 
 # the constructor supports variety of color notations
 color1 = Color.new('#00ff00')                 # #RRGGBB
@@ -33,6 +34,11 @@ c_one.diff(c_two)
 
 # the order in which we calculate the difference doesn't matter
 c_one.diff(c_two) == c_two.diff(c_one)
+
+# how to transform a set of colors to the closest colors of another set
+my_colors   = ['#7DF9FF', '#9ACD32', '#FF004F']
+safe_colors = JSON.load File.read 'web-safe.json'
+Color.transform_palette(my_colors, safe_colors)
 
 # you could also get the color name of a color if that color has a name
 color1.to_color_name # => "lime"
