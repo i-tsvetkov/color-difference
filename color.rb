@@ -83,6 +83,14 @@ class Color
     return palette
   end
 
+  def self.replace_palette_colors(palette, replace_rules)
+    new_palette = {}
+    palette.each do |fc, tc|
+      new_palette[fc] = replace_rules.key?(tc) ? replace_rules[tc] : tc
+    end
+    return new_palette
+  end
+
   def light
     l, _, _ = self.to_lab
     return l
