@@ -73,12 +73,14 @@ class Color
   def self.transform_palette(from_colors, to_colors)
     from_colors = from_colors.map{ |c| { color: Color.new(c), src: c } }
     to_colors   = to_colors.map{ |c| Color.new(c) }
-    from_colors.map do |fc|
+    palette = {}
+    from_colors.each do |fc|
       from = fc[:src]
       to   = to_colors.min_by{ |tc| fc[:color].diff(tc) }
       to.a = fc[:color].a
-      { old_color: from, new_color: to.to_s }
+      palette[from] = to.to_s
     end
+    return palette
   end
 
   def light
