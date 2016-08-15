@@ -86,9 +86,24 @@ class Color
 
   def self.replace_palette_colors(palette, replace_rules)
     new_palette = {}
-    palette.each do |fc, tc|
-      new_palette[fc] = replace_rules.key?(tc) ? replace_rules[tc] : tc
+    new_replace_rules = {}
+
+    replace_rules.each do |fc, tc|
+      new_replace_rules[self.new(fc)] = self.new(tc)
     end
+
+    palette.each do |fc, tc|
+      tcolor = self.new tc
+      key = new_replace_rules.keys.find{ |c| c.rgb_equal?(tcolor) }
+      if key.nil?
+        new_palette[fc] = tc
+      else
+        clr = new_replace_rules[key].dup
+        clr.a = tcolor.a
+        new_palette[fc] = clr.to_s
+      end
+    end
+
     return new_palette
   end
 
@@ -102,6 +117,12 @@ class Color
     @g == other.g &&
     @b == other.b &&
     @a == other.a
+  end
+
+  def rgb_equal?(other)
+    @r == other.r &&
+    @g == other.g &&
+    @b == other.b
   end
 
   def to_s
