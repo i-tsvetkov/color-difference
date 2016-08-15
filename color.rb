@@ -1,5 +1,6 @@
 class Color
   attr_accessor :r, :g, :b, :a
+  alias_method :eql?, :==
 
   INTEGER = /\s*([+-]?\d+)\s*/
   NUMBER  = /\s*([+-]?(?:\d*\.\d+|\d+)(?:[eE][+-]?\d+)?)\s*/
@@ -94,6 +95,13 @@ class Color
   def light
     l, _, _ = self.to_lab
     return l
+  end
+
+  def ==(other)
+    @r == other.r &&
+    @g == other.g &&
+    @b == other.b &&
+    @a == other.a
   end
 
   def to_s
