@@ -21,9 +21,7 @@ color8 = Color.new('rgba(0, 255, 0, 1)')      # rgba
 color9 = Color.new('hsla(120, 100%, 50%, 1)') # hsla
 
 # you could check that the above colors are all the same
-1.upto(9)
-  .map{ |i| eval "color#{i}" }
-   .map{ |c| [c.r, c.g, c.b, c.a] }.uniq.size == 1
+1.upto(9).map{ |i| eval "color#{i}" }.each_cons(2).all?{ |x, y| x == y }
 
 # let us define two colors
 c_one = Color.new '#aaaafb'
