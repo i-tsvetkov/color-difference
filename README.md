@@ -10,18 +10,20 @@ require './color.rb'
 require 'json'
 
 # the constructor supports variety of color notations
-color1 = Color.new('#00ff00')                 # #RRGGBB
-color2 = Color.new('#0f0')                    # #RGB
-color3 = Color.new('rgb(0, 255, 0)')          # rgb
-color4 = Color.new('hsl(120, 100%, 50%)')     # hsl
-color5 = Color.new('lime')                    # color names
-color6 = Color.new('#00ff00ff')               # #RRGGBBAA
-color7 = Color.new('#0f0f')                   # #RGBA
-color8 = Color.new('rgba(0, 255, 0, 1)')      # rgba
-color9 = Color.new('hsla(120, 100%, 50%, 1)') # hsla
+color1  = Color.new('#00ff00')                 # #RRGGBB
+color2  = Color.new('#0f0')                    # #RGB
+color3  = Color.new('rgb(0, 255, 0)')          # rgb
+color4  = Color.new('rgb(0%, 100%, 0%)')       # rgb with percentage notation
+color5  = Color.new('hsl(120, 100%, 50%)')     # hsl
+color6  = Color.new('lime')                    # color names
+color7  = Color.new('#00ff00ff')               # #RRGGBBAA
+color8  = Color.new('#0f0f')                   # #RGBA
+color9  = Color.new('rgba(0, 255, 0, 1)')      # rgba
+color10 = Color.new('rgba(0%, 100%, 0%, 1)')   # rgba with percentage notation
+color11 = Color.new('hsla(120, 100%, 50%, 1)') # hsla
 
 # you could check that the above colors are all the same
-1.upto(9).map{ |i| eval "color#{i}" }.each_cons(2).all?{ |x, y| x == y }
+1.upto(11).map{ |i| eval "color#{i}" }.each_cons(2).all?{ |x, y| x == y }
 
 # let us define two colors
 c_one = Color.new '#aaaafb'
